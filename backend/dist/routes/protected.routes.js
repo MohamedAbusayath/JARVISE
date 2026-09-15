@@ -1,0 +1,21 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const resource_controller_1 = require("../controllers/resource.controller");
+const auth_middleware_1 = require("../middleware/auth.middleware");
+const asyncHandler_1 = require("../utils/asyncHandler");
+const router = (0, express_1.Router)();
+router.use(auth_middleware_1.requireAuth);
+router.get("/conversations", (0, asyncHandler_1.asyncHandler)(resource_controller_1.listConversations));
+router.post("/conversations", (0, asyncHandler_1.asyncHandler)(resource_controller_1.createConversation));
+router.get("/conversations/:conversationId/messages", (0, asyncHandler_1.asyncHandler)(resource_controller_1.listMessages));
+router.post("/messages", (0, asyncHandler_1.asyncHandler)(resource_controller_1.createMessage));
+router.get("/memories", (0, asyncHandler_1.asyncHandler)(resource_controller_1.listMemories));
+router.post("/memories", (0, asyncHandler_1.asyncHandler)(resource_controller_1.createMemory));
+router.get("/memories/search", (0, asyncHandler_1.asyncHandler)(resource_controller_1.searchMemory));
+router.patch("/memories/:memoryId", (0, asyncHandler_1.asyncHandler)(resource_controller_1.updateMemory));
+router.delete("/memories/:memoryId", (0, asyncHandler_1.asyncHandler)(resource_controller_1.deleteMemory));
+router.get("/preferences", (0, asyncHandler_1.asyncHandler)(resource_controller_1.getPreferences));
+router.put("/preferences", (0, asyncHandler_1.asyncHandler)(resource_controller_1.upsertPreferences));
+exports.default = router;
+//# sourceMappingURL=protected.routes.js.map

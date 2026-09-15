@@ -1,0 +1,11 @@
+import { Request, Response } from "express";
+import { getAuthenticatedUser } from "../middleware/auth.middleware";
+import { sendSuccess } from "../utils/apiResponse";
+import { completeAuthorization, createAuthorizationUrl, getFileContent, getFileMetadata, listFiles } from "../services/drive.service";
+import { synchronizeDriveKnowledge } from "../services/drive-ingestion.service";
+export const connect = async (_req: Request, res: Response) => sendSuccess(res, { authorizationUrl: createAuthorizationUrl(getAuthenticatedUser(res).user.id) });
+export const callback = async (req: Request, res: Response) => sendSuccess(res, { connected: true, userId: await completeAuthorization(String(req.query.state || ""), String(req.query.code || "")) });
+export const files = async (req: Request, res: Response) => sendSuccess(res, await listFiles(getAuthenticatedUser(res).user.id, typeof req.query.pageToken === "string" ? req.query.pageToken : undefined));
+export const metadata = async (req: Request, res: Response) => sendSuccess(res, { file: await getFileMetadata(getAuthenticatedUser(res).user.id, String(req.params.fileId)) });
+export const content = async (req: Request, res: Response) => sendSuccess(res, await getFileContent(getAuthenticatedUser(res).user.id, String(req.params.fileId)));
+export const sync = async (_req: Request, res: Response) => sendSuccess(res, await synchronizeDriveKnowledge(getAuthenticatedUser(res).user.id));

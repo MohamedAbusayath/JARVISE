@@ -1,0 +1,20 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.sync = exports.content = exports.metadata = exports.files = exports.callback = exports.connect = void 0;
+const auth_middleware_1 = require("../middleware/auth.middleware");
+const apiResponse_1 = require("../utils/apiResponse");
+const drive_service_1 = require("../services/drive.service");
+const drive_ingestion_service_1 = require("../services/drive-ingestion.service");
+const connect = async (_req, res) => (0, apiResponse_1.sendSuccess)(res, { authorizationUrl: (0, drive_service_1.createAuthorizationUrl)((0, auth_middleware_1.getAuthenticatedUser)(res).user.id) });
+exports.connect = connect;
+const callback = async (req, res) => (0, apiResponse_1.sendSuccess)(res, { connected: true, userId: await (0, drive_service_1.completeAuthorization)(String(req.query.state || ""), String(req.query.code || "")) });
+exports.callback = callback;
+const files = async (req, res) => (0, apiResponse_1.sendSuccess)(res, await (0, drive_service_1.listFiles)((0, auth_middleware_1.getAuthenticatedUser)(res).user.id, typeof req.query.pageToken === "string" ? req.query.pageToken : undefined));
+exports.files = files;
+const metadata = async (req, res) => (0, apiResponse_1.sendSuccess)(res, { file: await (0, drive_service_1.getFileMetadata)((0, auth_middleware_1.getAuthenticatedUser)(res).user.id, String(req.params.fileId)) });
+exports.metadata = metadata;
+const content = async (req, res) => (0, apiResponse_1.sendSuccess)(res, await (0, drive_service_1.getFileContent)((0, auth_middleware_1.getAuthenticatedUser)(res).user.id, String(req.params.fileId)));
+exports.content = content;
+const sync = async (_req, res) => (0, apiResponse_1.sendSuccess)(res, await (0, drive_ingestion_service_1.synchronizeDriveKnowledge)((0, auth_middleware_1.getAuthenticatedUser)(res).user.id));
+exports.sync = sync;
+//# sourceMappingURL=drive.controller.js.map
