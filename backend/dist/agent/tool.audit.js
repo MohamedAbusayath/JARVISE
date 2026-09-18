@@ -8,6 +8,8 @@ const auditToolEvent = async (userId, toolName, outcome, eventType = outcome ===
     : outcome === "denied"
         ? "tool.denied"
         : "tool.requested", details = {}) => {
+    const resourceId = typeof details.resourceId === "string" ? details.resourceId : undefined;
+    const { resourceId: _ignoredResourceId, ...safeDetails } = details;
     const { error } = await (0, database_1.getSupabaseServiceClient)()
         .schema("private")
         .from("audit_events")
@@ -16,10 +18,11 @@ const auditToolEvent = async (userId, toolName, outcome, eventType = outcome ===
         actor_kind: "user",
         event_type: eventType,
         outcome,
-        resource_type: "tool",
+        resource_type: typeof details.resource_type === "string" ? details.resource_type : "tool",
+        resource_id: resourceId,
         details: {
             tool: toolName,
-            ...details
+            ...safeDetails
         }
     });
     if (error) {

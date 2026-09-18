@@ -12,6 +12,8 @@ export const auditToolEvent = async (
           : "tool.requested",
     details: Record<string, unknown> = {}
 ): Promise<void> => {
+    const resourceId = typeof details.resourceId === "string" ? details.resourceId : undefined;
+    const { resourceId: _ignoredResourceId, ...safeDetails } = details;
     const { error } = await getSupabaseServiceClient()
         .schema("private")
         .from("audit_events")
@@ -20,10 +22,11 @@ export const auditToolEvent = async (
             actor_kind: "user",
             event_type: eventType,
             outcome,
-            resource_type: "tool",
+            resource_type: typeof details.resource_type === "string" ? details.resource_type : "tool",
+            resource_id: resourceId,
             details: {
                 tool: toolName,
-                ...details
+                ...safeDetails
             }
         });
 

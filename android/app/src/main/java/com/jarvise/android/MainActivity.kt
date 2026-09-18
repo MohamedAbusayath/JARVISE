@@ -38,6 +38,7 @@ import kotlinx.coroutines.withContext
 data class UiMessage(val role: String, val text: String)
 
 class MainActivity : ComponentActivity() {
+    private lateinit var sessionStore: SessionStore
     private lateinit var api: JarvisApi
     private lateinit var voice: VoiceController
     private val messages = mutableStateListOf<UiMessage>()
@@ -65,9 +66,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        api = JarvisApi(SessionStore(this))
+        sessionStore = SessionStore(this)
+        api = JarvisApi(sessionStore)
         voice = VoiceController(this, ::submitVoice, ::onVoiceState)
-        authenticated = SessionStore(this).accessToken != null
+        authenticated = sessionStore.accessToken != null
         setContent { MaterialTheme { if (authenticated) ChatScreen() else AuthScreen() } }
     }
 
@@ -122,6 +124,21 @@ class MainActivity : ComponentActivity() {
             notificationsEnabled = true
             return
         }
+
+        private fun logout() {
+            lifecycleScope.launch {
+                try {
+                    withContext(Dispatchers.IO) { api.logout() }
+                } catch (_: Exception) {
+                    sessionStore.clear()
+                } finally {
+                    authenticated = false
+                    messages.clear()
+                    draft = ""
+                    error = ""
+                }
+            }
+        }
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
             notificationsEnabled = true
         } else {
@@ -154,7 +171,10 @@ class MainActivity : ComponentActivity() {
     @androidx.compose.runtime.Composable
     private fun ChatScreen() {
         Column(Modifier.fillMaxSize().padding(16.dp)) {
-            Text("JARVISE", style = MaterialTheme.typography.headlineMedium)
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text("JARVISE", style = MaterialTheme.typography.headlineMedium)
+                Button({ logout() }, enabled = !busy) { Text("Sign out") }
+            }
             LazyColumn(Modifier.weight(1f)) {
                 items(messages) { Text("${it.role}: ${it.text}", Modifier.padding(vertical = 8.dp)) }
             }

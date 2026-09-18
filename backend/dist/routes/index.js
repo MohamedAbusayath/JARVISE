@@ -9,11 +9,13 @@ const chat_routes_1 = __importDefault(require("./chat.routes"));
 const auth_routes_1 = __importDefault(require("./auth.routes"));
 const protected_routes_1 = __importDefault(require("./protected.routes"));
 const drive_routes_1 = __importDefault(require("./drive.routes"));
+const task_routes_1 = __importDefault(require("./task.routes"));
 const router = (0, express_1.Router)();
 router.use("/health", health_routes_1.default);
 router.use("/chat", chat_routes_1.default);
 router.use("/auth", auth_routes_1.default);
 router.use("/drive", drive_routes_1.default);
+router.use("/tasks", task_routes_1.default);
 router.use("/", protected_routes_1.default);
 exports.default = router;
 //# sourceMappingURL=index.js.map

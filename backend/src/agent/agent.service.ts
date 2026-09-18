@@ -4,6 +4,7 @@ import { auditToolEvent } from "./tool.audit";
 import { executeTool, ToolResult } from "./tool.registry";
 import { ToolAuthorizationContext } from "./tool.types";
 import "./tools";
+import "./task.tools";
 
 const toolSignals: Array<{ name: string; patterns: RegExp[] }> = [
     {

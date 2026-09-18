@@ -5,6 +5,7 @@ const AppError_1 = require("../utils/AppError");
 const tool_audit_1 = require("./tool.audit");
 const tool_registry_1 = require("./tool.registry");
 require("./tools");
+require("./task.tools");
 const toolSignals = [
     {
         name: "get_current_time",
